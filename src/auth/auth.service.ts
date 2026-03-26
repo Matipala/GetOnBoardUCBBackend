@@ -29,6 +29,9 @@ export class AuthService {
   }
 
   async signOut(email: string) {
+    if (!email) {
+      return { message: 'Sesión cerrada' };
+    }
     const user = await this.userService.findByEmail(email);
     if (!user) throw new UnauthorizedException('Correo incorrecto');
 
