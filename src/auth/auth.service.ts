@@ -12,12 +12,10 @@ export class AuthService {
 
   async signIn(email: string, pass: string) {
     const user = await this.userService.findByEmail(email);
-    if (!user)
-      throw new UnauthorizedException('Correo o contraseña incorrecta');
+    if (!user) throw new UnauthorizedException('Correo incorrecto');
 
     const isMatch = await bcrypt.compare(pass, user.password);
-    if (!isMatch)
-      throw new UnauthorizedException('Correo o contraseña incorrecta');
+    if (!isMatch) throw new UnauthorizedException('Contraseña incorrecta');
 
     const payload = { sub: user.id, username: user.email, role: user.role };
     return {
