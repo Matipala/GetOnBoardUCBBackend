@@ -27,4 +27,13 @@ export class AuthService {
       },
     };
   }
+
+  async signOut(email: string) {
+    const user = await this.userService.findByEmail(email);
+    if (!user) throw new UnauthorizedException('Correo incorrecto');
+
+    return {
+      message: 'Logout exitoso',
+    };
+  }
 }
