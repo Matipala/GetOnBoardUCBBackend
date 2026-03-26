@@ -14,6 +14,6 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('logout')
   signOut(@Body() signOutDto: Record<string, string>) {
-    return this.authService.signOut(signOutDto.email);
+    return this.authService.signOut(signOutDto?.email);
   }
 }
