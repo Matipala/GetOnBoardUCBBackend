@@ -14,7 +14,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UserRole } from './entities/user.entity';
 
-import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
+import * as requestWithUserInterface from '../common/interfaces/request-with-user.interface';
 
 @Controller('users')
 export class UsersController {
@@ -33,7 +33,9 @@ export class UsersController {
 
   @Roles('coordinator')
   @Get('coordinator/stats')
-  async getCoordinatorStats(@Req() req: RequestWithUser) {
+  async getCoordinatorStats(
+    @Req() req: requestWithUserInterface.RequestWithUser,
+  ) {
     let career = req.user.career;
 
     if (!career) {
@@ -51,7 +53,10 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @Req() req: RequestWithUser) {
+  findOne(
+    @Param('id') id: string,
+    @Req() req: requestWithUserInterface.RequestWithUser,
+  ) {
     const requesterId = req.user.sub;
     const requesterRole = req.user.role;
     if (
@@ -68,7 +73,7 @@ export class UsersController {
   update(
     @Param('id') id: string,
     @Body() dto: UpdateUserDto,
-    @Req() req: RequestWithUser,
+    @Req() req: requestWithUserInterface.RequestWithUser,
   ) {
     const requesterId = req.user.sub;
     const requesterRole = req.user.role;
