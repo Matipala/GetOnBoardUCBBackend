@@ -3,7 +3,11 @@ import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
 export class CreateOfferDto {
   @IsString()
   @IsNotEmpty()
-  tittle: string;
+  title: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
 
   @IsString()
   @IsNotEmpty()
@@ -23,5 +27,5 @@ export class CreateOfferDto {
 
   @IsString()
   @IsOptional()
-  employerId?: string;
+  career?: string;
 }

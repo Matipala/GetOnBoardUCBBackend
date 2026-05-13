@@ -10,5 +10,6 @@ import { Application } from './entities/application.entity';
   imports: [TypeOrmModule.forFeature([Application])],
   controllers: [ApplicationsController],
   providers: [ApplicationsService, CloudinaryProvider, CloudinaryService],
+  exports: [ApplicationsService, CloudinaryProvider, CloudinaryService],
 })
 export class ApplicationsModule {}

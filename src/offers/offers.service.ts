@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateOfferDto } from './dto/create-offer.dto';
@@ -12,8 +16,11 @@ export class OffersService {
     private readonly offersRepository: Repository<Offer>,
   ) {}
 
-  async create(createOfferDto: CreateOfferDto) {
-    const offer = this.offersRepository.create(createOfferDto);
+  async create(createOfferDto: CreateOfferDto, employerId: string) {
+    const offer = this.offersRepository.create({
+      ...createOfferDto,
+      employerId,
+    });
     return await this.offersRepository.save(offer);
   }
 
@@ -24,16 +31,51 @@ export class OffersService {
   }
 
   async findOne(id: number) {
-    return await this.offersRepository.findOne({ where: { id } });
+    const offer = await this.offersRepository.findOne({ where: { id } });
+    if (!offer) throw new NotFoundException('Oferta no encontrada');
+    return offer;
   }
 
-  async update(id: number, updateOfferDto: UpdateOfferDto) {
+  async findByEmployer(employerId: string) {
+    return await this.offersRepository.find({
+      where: { employerId },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async findByCareer(career: string) {
+    return await this.offersRepository.find({
+      where: { career },
+      relations: ['applications'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async update(
+    id: number,
+    updateOfferDto: UpdateOfferDto,
+    userId: string,
+    role: string,
+  ) {
+    const offer = await this.findOne(id);
+    if (role !== 'admin' && offer.employerId !== userId) {
+      throw new ForbiddenException('No puedes editar esta oferta');
+    }
     await this.offersRepository.update(id, updateOfferDto);
     return this.findOne(id);
   }
 
-  async remove(id: number) {
+  async remove(id: number, userId: string, role: string) {
+    const offer = await this.findOne(id);
+    if (role !== 'admin' && offer.employerId !== userId) {
+      throw new ForbiddenException('No puedes eliminar esta oferta');
+    }
     await this.offersRepository.delete(id);
     return { deleted: true };
+  }
+
+  async getStats() {
+    const total = await this.offersRepository.count();
+    return { total };
   }
 }

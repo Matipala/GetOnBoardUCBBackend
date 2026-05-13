@@ -18,7 +18,7 @@ export class ApplicationsService {
   ) {}
 
   async create(
-    createApplicationDto: CreateApplicationDto,
+    createApplicationDto: CreateApplicationDto & { studentId: string },
     file: Express.Multer.File,
   ) {
     if (!file) {
@@ -66,6 +66,13 @@ export class ApplicationsService {
       where: { studentId },
       relations: ['offer'],
       order: { createdAt: 'DESC' },
+    });
+  }
+
+  async countPendingByStudents(studentIds: string[]) {
+    if (studentIds.length === 0) return 0;
+    return await this.applicationRepository.count({
+      where: studentIds.map((id) => ({ studentId: id, status: 'PENDING' })),
     });
   }
 
