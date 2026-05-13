@@ -1,10 +1,9 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateApplicationDto {
-  @IsString()
+  // studentId ya no viene del body — lo inyecta el controller desde el JWT
   @IsNotEmpty()
-  studentId: string;
-
-  @IsNotEmpty()
+  @Type(() => Number)
   offerId: number;
 }

@@ -1,13 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-export type UserRole =
-  | 'admin'
-  | 'student'
-  | 'employer'
-  | 'coordinator'
-  | 'Usuario';
+export type UserRole = 'admin' | 'student' | 'employer' | 'coordinator';
 
-@Entity()
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -20,6 +15,16 @@ export class User {
 
   @Column()
   password: string;
-  @Column({ default: 'Usuario' })
+
+  @Column({ default: 'student' })
   role: UserRole;
+
+  @Column({ nullable: true })
+  career: string;
+
+  @Column({ default: true })
+  isActive: boolean;
+
+  @Column({ type: 'varchar', nullable: true })
+  hashedRefreshToken: string | null;
 }
