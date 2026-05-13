@@ -15,7 +15,7 @@ import { UpdateOfferDto } from './dto/update-offer.dto';
 import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 
-import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
+import * as requestWithUserInterface from '../common/interfaces/request-with-user.interface';
 
 @Controller('offers')
 export class OffersController {
@@ -29,7 +29,7 @@ export class OffersController {
 
   @Roles('employer', 'admin')
   @Get('employer/mine')
-  findMine(@Req() req: RequestWithUser) {
+  findMine(@Req() req: requestWithUserInterface.RequestWithUser) {
     return this.offersService.findByEmployer(req.user.sub);
   }
 
@@ -53,7 +53,10 @@ export class OffersController {
 
   @Roles('employer', 'admin')
   @Post()
-  create(@Body() createOfferDto: CreateOfferDto, @Req() req: RequestWithUser) {
+  create(
+    @Body() createOfferDto: CreateOfferDto,
+    @Req() req: requestWithUserInterface.RequestWithUser,
+  ) {
     return this.offersService.create(createOfferDto, req.user.sub);
   }
 
@@ -62,7 +65,7 @@ export class OffersController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateOfferDto: UpdateOfferDto,
-    @Req() req: RequestWithUser,
+    @Req() req: requestWithUserInterface.RequestWithUser,
   ) {
     return this.offersService.update(
       id,
@@ -74,7 +77,10 @@ export class OffersController {
 
   @Roles('employer', 'admin')
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number, @Req() req: RequestWithUser) {
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: requestWithUserInterface.RequestWithUser,
+  ) {
     return this.offersService.remove(id, req.user.sub, req.user.role);
   }
 }

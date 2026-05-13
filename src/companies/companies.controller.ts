@@ -17,7 +17,7 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 import { AuthGuard } from '../common/guards/auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
-import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
+import * as requestWithUserInterface from '../common/interfaces/request-with-user.interface';
 
 @Controller('companies')
 export class CompaniesController {
@@ -26,7 +26,7 @@ export class CompaniesController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('employer')
   @Get('me')
-  findMyCompany(@Request() req: RequestWithUser) {
+  findMyCompany(@Request() req: requestWithUserInterface.RequestWithUser) {
     return this.companiesService.findMyCompany(req.user.sub);
   }
 
@@ -34,7 +34,7 @@ export class CompaniesController {
   @Roles('employer')
   @Patch('me')
   updateMyCompany(
-    @Request() req: RequestWithUser,
+    @Request() req: requestWithUserInterface.RequestWithUser,
     @Body() updateCompanyDto: UpdateCompanyDto,
   ) {
     return this.companiesService.updateMyCompany(
@@ -48,7 +48,7 @@ export class CompaniesController {
   @Post('me/logo')
   @UseInterceptors(FileInterceptor('file'))
   async uploadLogo(
-    @Request() req: RequestWithUser,
+    @Request() req: requestWithUserInterface.RequestWithUser,
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (!file) {

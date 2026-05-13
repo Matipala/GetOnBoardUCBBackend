@@ -17,7 +17,7 @@ import { ApplicationsService } from './applications.service';
 import { CreateApplicationDto } from './dto/create-application.dto';
 import { Roles } from '../common/decorators/roles.decorator';
 
-import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
+import * as requestWithUserInterface from '../common/interfaces/request-with-user.interface';
 
 @Controller('applications')
 export class ApplicationsController {
@@ -37,7 +37,7 @@ export class ApplicationsController {
       }),
     )
     file: Express.Multer.File,
-    @Req() req: RequestWithUser,
+    @Req() req: requestWithUserInterface.RequestWithUser,
   ) {
     const studentId = req.user.sub;
     return this.applicationsService.create(
@@ -54,7 +54,7 @@ export class ApplicationsController {
 
   @Roles('student')
   @Get('student/mine')
-  findMyApplications(@Req() req: RequestWithUser) {
+  findMyApplications(@Req() req: requestWithUserInterface.RequestWithUser) {
     return this.applicationsService.findAllByStudent(req.user.sub);
   }
 
