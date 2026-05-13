@@ -1,6 +1,7 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public } from '../common/decorators/public.decorator';
+import { UserRole } from '../users/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -27,7 +28,7 @@ export class AuthController {
       signUpDto.email,
       signUpDto.password,
       signUpDto.fullName,
-      signUpDto.role,
+      signUpDto.role as UserRole,
       signUpDto.career,
     );
   }
