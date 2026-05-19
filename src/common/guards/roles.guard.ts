@@ -9,7 +9,7 @@ import { ROLES_KEY } from '../decorators/roles.decorator';
 import { UserRole } from '../../users/entities/user.entity';
 
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
-
+// para verificar que el usuario tenga los permisos necesarios para entrar a una ruta
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
