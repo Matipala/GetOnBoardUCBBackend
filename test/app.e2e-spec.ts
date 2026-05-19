@@ -53,7 +53,7 @@ describe('AppController (e2e)', () => {
     return request(app.getHttpServer())
       .get('/')
       .expect(200)
-      .expect('Hello World!');
+      .expect('Hola Cambada!');
   });
 
   it('auth flow: register, login, refresh, protected route', async () => {
@@ -112,7 +112,7 @@ describe('AppController (e2e)', () => {
     expect(profileResponse.body).toHaveProperty('id', userId);
   });
 
-  it('offers flow: employer can create and fetch offers', async () => {
+  it('flujo de ofertas: empleador puede crear y obtener ofertas', async () => {
     const employerEmail = `e2e_employer_${Date.now()}_${Math.random()
       .toString(16)
       .slice(2)}@test.com`;
