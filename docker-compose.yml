@@ -5,9 +5,9 @@ services:
     image: postgres:15
     container_name: getonboard_db
     environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: 12345
-      POSTGRES_DB: getonboard
+      POSTGRES_USER: ${DB_USER:-root}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-12345}
+      POSTGRES_DB: ${DB_NAME:-getonboard}
     ports:
       - "5432:5432"
     volumes:

@@ -10,7 +10,7 @@ import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { UserPayload } from '../interfaces/user-payload.interface';
 
 import { Request } from 'express';
-
+//para verificar que el usuario este autenticado
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
