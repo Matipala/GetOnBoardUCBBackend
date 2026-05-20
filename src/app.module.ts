@@ -15,18 +15,19 @@ import { CompaniesModule } from './companies/companies.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    //conexion a la base de datos usando TypeORM
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
+        type: 'postgres', //cargamos las variables de entorno
         host: configService.get<string>('DB_HOST'),
         port: configService.get<number>('DB_PORT'),
         username: configService.get<string>('DB_USER'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true,
+        entities: [__dirname + '/**/*.entity{.ts,.js}'], //la carga de las entidades
+        synchronize: true, //la sincronizacion para crear/actualizar la base de datos
       }),
     }),
     OffersModule,

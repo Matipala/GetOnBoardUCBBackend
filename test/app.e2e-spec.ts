@@ -4,7 +4,57 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 
+type AuthUserResponse = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  career: string | null;
+};
+
+type AuthResponse = {
+  access_token: string;
+  refresh_token: string;
+  user: AuthUserResponse;
+};
+
+type OfferResponse = {
+  id: number;
+  title: string;
+  description?: string | null;
+  company?: string | null;
+  location?: string | null;
+  salary?: string | null;
+  type: string;
+  career?: string | null;
+  employerId?: string | null;
+  createdAt?: string;
+};
+
 describe('AppController (e2e)', () => {
+  const testUsers = {
+    authStudent: {
+      email: 'e2e.student@test.com',
+      password: 'Test12345',
+      fullName: 'E2E Cristopher',
+      role: 'student',
+      career: 'Ingenieria de Software',
+    },
+    employer: {
+      email: 'e2e.employer@test.com',
+      password: 'Test12345',
+      fullName: 'E2E Gonzalo',
+      role: 'employer',
+      career: 'Ingenieria de Software',
+    },
+    student: {
+      email: 'e2e.student2@test.com',
+      password: 'Test12345',
+      fullName: 'E2E Evert',
+      role: 'student',
+      career: 'Ingenieria de Software',
+    },
+  };
   let app: INestApplication<App>;
 
   beforeEach(async () => {
@@ -20,6 +70,149 @@ describe('AppController (e2e)', () => {
     return request(app.getHttpServer())
       .get('/')
       .expect(200)
-      .expect('Hello World!');
+      .expect('Hola Cambada!');
+  });
+
+  it('auth flow: register, login, refresh, protected route', async () => {
+    const { email, password, fullName, role, career } = testUsers.authStudent;
+
+    const registerResponse = await request(app.getHttpServer())
+      .post('/auth/register')
+      .send({
+        email,
+        password,
+        fullName,
+        role,
+        career,
+      })
+      .expect(200);
+
+    const registerBody = registerResponse.body as AuthResponse;
+
+    expect(registerBody).toHaveProperty('access_token'); //token de acceso para autenticar
+    expect(registerBody).toHaveProperty('refresh_token'); //token para renovar el acceso expirado
+    expect(registerBody).toHaveProperty('user'); // objeto del usuario creado id, email, rol y carrera
+
+    const userId = registerBody.user.id;
+
+    const loginResponse = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        email,
+        password,
+      })
+      .expect(200);
+
+    const loginBody = loginResponse.body as AuthResponse; // verifica que entrega los tokens para autenticar y refresh
+    const accessToken = loginBody.access_token;
+    const refreshToken = loginBody.refresh_token;
+
+    expect(accessToken).toBeTruthy(); //valida que no este vacio o nulo
+    expect(refreshToken).toBeTruthy();
+
+    await request(app.getHttpServer())
+      .post('/auth/refresh')
+      .send({
+        userId,
+        refreshToken,
+      })
+      .expect(200);
+
+    const profileResponse = await request(app.getHttpServer())
+      .get(`/users/${userId}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+
+    expect(profileResponse.body).toHaveProperty('id', userId);
+  });
+
+  it('flujo de ofertas: empleador puede crear y estudiante obtener ofertas', async () => {
+    const employer = testUsers.employer;
+    const student = testUsers.student;
+
+    await request(app.getHttpServer())
+      .post('/auth/register')
+      .send({
+        email: employer.email,
+        password: employer.password,
+        fullName: employer.fullName,
+        role: employer.role,
+        career: employer.career,
+      })
+      .expect(200);
+
+    const employerLoginResponse = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        email: employer.email,
+        password: employer.password,
+      })
+      .expect(200);
+
+    const employerLoginBody = employerLoginResponse.body as AuthResponse;
+    const employerToken = employerLoginBody.access_token;
+
+    const offerPayload = {
+      title: 'Frontend Intern',
+      description: 'E2E offer',
+      company: 'TechCorp',
+      location: 'COCHABAMBA',
+      salary: '1000',
+      type: 'Practica',
+      career: 'Ingenieria de Software',
+    };
+
+    const createOfferResponse = await request(app.getHttpServer())
+      .post('/offers')
+      .set('Authorization', `Bearer ${employerToken}`)
+      .send(offerPayload)
+      .expect(201);
+
+    const createdOffer = createOfferResponse.body as OfferResponse;
+    expect(createdOffer).toHaveProperty('id');
+    expect(createdOffer).toHaveProperty('title', offerPayload.title);
+
+    const offerId = createdOffer.id;
+
+    await request(app.getHttpServer()).get(`/offers/${offerId}`).expect(200);
+
+    const myOffersResponse = await request(app.getHttpServer())
+      .get('/offers/employer/mine')
+      .set('Authorization', `Bearer ${employerToken}`)
+      .expect(200);
+
+    const myOffers = myOffersResponse.body as OfferResponse[];
+
+    expect(Array.isArray(myOffers)).toBe(true);
+    expect(myOffers.some((offer) => offer.id === offerId)).toBe(true);
+
+    await request(app.getHttpServer())
+      .post('/auth/register')
+      .send({
+        email: student.email,
+        password: student.password,
+        fullName: student.fullName,
+        role: student.role,
+        career: student.career,
+      })
+      .expect(200);
+
+    const studentLoginResponse = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        email: student.email,
+        password: student.password,
+      })
+      .expect(200);
+
+    const studentLoginBody = studentLoginResponse.body as AuthResponse;
+    const studentToken = studentLoginBody.access_token;
+
+    const byCareerResponse = await request(app.getHttpServer())
+      .get('/offers/career/Ingenieria de Software')
+      .set('Authorization', `Bearer ${studentToken}`)
+      .expect(200);
+
+    expect(Array.isArray(byCareerResponse.body)).toBe(true);
   });
 });

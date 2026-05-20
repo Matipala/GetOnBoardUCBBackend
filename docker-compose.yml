@@ -12,6 +12,37 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-root} -d ${DB_NAME:-getonboard}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: getonboard_backend
+    ports:
+      # MAPEADO: Puerto 3004 en mi mac -> Puerto 3001 dentro de Docker
+      - "3004:${PORT:-3001}"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - PORT=${PORT:-3001}
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=${DB_USER:-root}
+      - DB_PASSWORD=${DB_PASSWORD:-12345}
+      - DB_NAME=${DB_NAME:-getonboard}
+      - JWT_SECRET=${JWT_SECRET}
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy
+    command: npm run start:dev
 volumes:
   postgres_data:
