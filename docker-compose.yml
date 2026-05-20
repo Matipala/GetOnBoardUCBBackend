@@ -24,7 +24,7 @@ services:
       dockerfile: Dockerfile
     container_name: getonboard_backend
     ports:
-      # MAPEADO: Puerto 3004 en tu PC -> Puerto 3001 dentro de Docker
+      # MAPEADO: Puerto 3004 en mi mac -> Puerto 3001 dentro de Docker
       - "3004:${PORT:-3001}"
     volumes:
       - .:/app
@@ -44,6 +44,5 @@ services:
       db:
         condition: service_healthy
     command: npm run start:dev
-
 volumes:
   postgres_data:

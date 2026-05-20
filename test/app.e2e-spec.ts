@@ -34,6 +34,29 @@ type OfferResponse = {
 };
 
 describe('AppController (e2e)', () => {
+  const testUsers = {
+    authStudent: {
+      email: 'e2e.student@test.com',
+      password: 'Test12345',
+      fullName: 'E2E Cristopher',
+      role: 'student',
+      career: 'Ingenieria de Software',
+    },
+    employer: {
+      email: 'e2e.employer@test.com',
+      password: 'Test12345',
+      fullName: 'E2E Gonzalo',
+      role: 'employer',
+      career: 'Ingenieria de Software',
+    },
+    student: {
+      email: 'e2e.student2@test.com',
+      password: 'Test12345',
+      fullName: 'E2E Evert',
+      role: 'student',
+      career: 'Ingenieria de Software',
+    },
+  };
   let app: INestApplication<App>;
 
   beforeAll(async () => {
@@ -57,43 +80,40 @@ describe('AppController (e2e)', () => {
   });
 
   it('auth flow: register, login, refresh, protected route', async () => {
-    const uniqueEmail = `e2e_${Date.now()}_${Math.random()
-      .toString(16)
-      .slice(2)}@test.com`;
-    const password = 'Test12345!';
+    const { email, password, fullName, role, career } = testUsers.authStudent;
 
     const registerResponse = await request(app.getHttpServer())
       .post('/auth/register')
       .send({
-        email: uniqueEmail,
+        email,
         password,
-        fullName: 'E2E User',
-        role: 'student',
-        career: 'Ingenieria',
+        fullName,
+        role,
+        career,
       })
       .expect(200);
 
     const registerBody = registerResponse.body as AuthResponse;
 
-    expect(registerBody).toHaveProperty('access_token');
-    expect(registerBody).toHaveProperty('refresh_token');
-    expect(registerBody).toHaveProperty('user');
+    expect(registerBody).toHaveProperty('access_token'); //token de acceso para autenticar
+    expect(registerBody).toHaveProperty('refresh_token'); //token para renovar el acceso expirado
+    expect(registerBody).toHaveProperty('user'); // objeto del usuario creado id, email, rol y carrera
 
     const userId = registerBody.user.id;
 
     const loginResponse = await request(app.getHttpServer())
       .post('/auth/login')
       .send({
-        email: uniqueEmail,
+        email,
         password,
       })
       .expect(200);
 
-    const loginBody = loginResponse.body as AuthResponse;
+    const loginBody = loginResponse.body as AuthResponse; // verifica que entrega los tokens para autenticar y refresh
     const accessToken = loginBody.access_token;
     const refreshToken = loginBody.refresh_token;
 
-    expect(accessToken).toBeTruthy();
+    expect(accessToken).toBeTruthy(); //valida que no este vacio o nulo
     expect(refreshToken).toBeTruthy();
 
     await request(app.getHttpServer())
@@ -112,31 +132,26 @@ describe('AppController (e2e)', () => {
     expect(profileResponse.body).toHaveProperty('id', userId);
   });
 
-  it('flujo de ofertas: empleador puede crear y obtener ofertas', async () => {
-    const employerEmail = `e2e_employer_${Date.now()}_${Math.random()
-      .toString(16)
-      .slice(2)}@test.com`;
-    const studentEmail = `e2e_student_${Date.now()}_${Math.random()
-      .toString(16)
-      .slice(2)}@test.com`;
-    const password = 'Test12345!';
+  it('flujo de ofertas: empleador puede crear y estudiante obtener ofertas', async () => {
+    const employer = testUsers.employer;
+    const student = testUsers.student;
 
     await request(app.getHttpServer())
       .post('/auth/register')
       .send({
-        email: employerEmail,
-        password,
-        fullName: 'E2E Employer',
-        role: 'employer',
-        career: 'Ingenieria',
+        email: employer.email,
+        password: employer.password,
+        fullName: employer.fullName,
+        role: employer.role,
+        career: employer.career,
       })
       .expect(200);
 
     const employerLoginResponse = await request(app.getHttpServer())
       .post('/auth/login')
       .send({
-        email: employerEmail,
-        password,
+        email: employer.email,
+        password: employer.password,
       })
       .expect(200);
 
@@ -144,13 +159,13 @@ describe('AppController (e2e)', () => {
     const employerToken = employerLoginBody.access_token;
 
     const offerPayload = {
-      title: 'Backend Intern',
-      description: 'E2E offer test',
-      company: 'E2E Co',
-      location: 'La Paz',
+      title: 'Frontend Intern',
+      description: 'E2E offer',
+      company: 'TechCorp',
+      location: 'COCHABAMBA',
       salary: '1000',
       type: 'Practica',
-      career: 'Ingenieria',
+      career: 'Ingenieria de Software',
     };
 
     const createOfferResponse = await request(app.getHttpServer())
@@ -180,19 +195,19 @@ describe('AppController (e2e)', () => {
     await request(app.getHttpServer())
       .post('/auth/register')
       .send({
-        email: studentEmail,
-        password,
-        fullName: 'E2E Student',
-        role: 'student',
-        career: 'Ingenieria',
+        email: student.email,
+        password: student.password,
+        fullName: student.fullName,
+        role: student.role,
+        career: student.career,
       })
       .expect(200);
 
     const studentLoginResponse = await request(app.getHttpServer())
       .post('/auth/login')
       .send({
-        email: studentEmail,
-        password,
+        email: student.email,
+        password: student.password,
       })
       .expect(200);
 
@@ -200,7 +215,7 @@ describe('AppController (e2e)', () => {
     const studentToken = studentLoginBody.access_token;
 
     const byCareerResponse = await request(app.getHttpServer())
-      .get('/offers/career/Ingenieria')
+      .get('/offers/career/Ingenieria de Software')
       .set('Authorization', `Bearer ${studentToken}`)
       .expect(200);
 

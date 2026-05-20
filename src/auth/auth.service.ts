@@ -24,16 +24,16 @@ export class AuthService {
     role: UserRole,
     career?: string,
   ) {
-    const payload: UserPayload = { sub: userId, email, role, career };
+    const payload: UserPayload = { sub: userId, email, role, career }; //generamos dos tokens con su tiempo de vida
     const [access_token, refresh_token] = await Promise.all([
       this.jwtService.signAsync(payload, {
-        secret: this.configService.get<string>('JWT_SECRET'),
+        secret: this.configService.get<string>('JWT_SECRET'), //aprueba el acceso token y expira en 15m
         expiresIn: '15m',
       }),
       this.jwtService.signAsync(payload, {
         secret:
           this.configService.get<string>('JWT_REFRESH_SECRET') ||
-          this.configService.get<string>('JWT_SECRET'),
+          this.configService.get<string>('JWT_SECRET'), //aprueba el refresh o secret si no hay y expira en 1d
         expiresIn: '1d',
       }),
     ]);
@@ -126,12 +126,12 @@ export class AuthService {
   async refreshTokens(userId: string, refreshToken: string) {
     const user = await this.userService.findOne(userId);
     if (!user || !user.hashedRefreshToken) {
-      throw new ForbiddenException('Acceso denegado');
+      throw new ForbiddenException('Acceso denegado'); //solo se refresca si existe el usuario y tiene un token guardado
     }
 
     const isMatch = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
     if (!isMatch) {
-      throw new ForbiddenException('Acceso denegado');
+      throw new ForbiddenException('Acceso denegado'); //si no coincide en la BD entonces el error para negar el refresh
     }
 
     try {
@@ -141,7 +141,7 @@ export class AuthService {
           this.configService.get<string>('JWT_SECRET'),
       });
     } catch {
-      throw new ForbiddenException('Token expirado o inválido');
+      throw new ForbiddenException('Token expirado o inválido'); ////valida las variables si expira lanza el error
     }
 
     const tokens = await this.generateTokens(
@@ -150,7 +150,7 @@ export class AuthService {
       user.role,
       user.career,
     );
-    await this.userService.updateRefreshToken(user.id, tokens.refresh_token);
+    await this.userService.updateRefreshToken(user.id, tokens.refresh_token); //actualiza el refresh en la BD y devuelve el nuevo
 
     return tokens;
   }

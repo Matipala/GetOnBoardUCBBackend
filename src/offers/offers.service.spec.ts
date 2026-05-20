@@ -24,20 +24,18 @@ describe('OffersService', () => {
       title: 'Dev Intern',
       description: 'Test',
       company: 'Test Co',
-      location: 'LPZ',
+      location: 'SCZ',
       salary: '1000',
       type: 'Practica',
       career: 'Ingenieria',
     };
-
     repository.create.mockReturnValue({ ...payload, employerId: 'emp-1' });
     repository.save.mockResolvedValue({
       ...payload,
       id: 1,
       employerId: 'emp-1',
     });
-
-    const result = await service.create(payload, 'emp-1');
+    const result = await service.create(payload, 'emp-1'); //crear oferta
 
     expect(repository.create).toHaveBeenCalledWith({
       ...payload,
