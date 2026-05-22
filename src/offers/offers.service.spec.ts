@@ -30,9 +30,9 @@ describe('OffersService (integration)', () => {
   beforeAll(async () => {
     process.env.DB_HOST = process.env.DB_HOST || '127.0.0.1';
     process.env.DB_PORT = process.env.DB_PORT || '5432';
-    process.env.DB_USER = process.env.DB_USER || 'root';
-    process.env.DB_PASSWORD = process.env.DB_PASSWORD || '12345';
-    process.env.DB_NAME = process.env.DB_NAME || 'getonboard';
+    process.env.DB_USER = process.env.DB_USER || 'postgres';
+    process.env.DB_PASSWORD = process.env.DB_PASSWORD || 'postgres';
+    process.env.DB_NAME = process.env.DB_NAME || 'getonboard_test';
 
     moduleRef = await Test.createTestingModule({
       imports: [AppModule],
