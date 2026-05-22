@@ -1,0 +1,33 @@
+name: backend-cd
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    environment:
+      name: dev
+    steps:
+      - name: Simulate deploy to dev
+        run: |
+          echo "Deploy simulated for dev environment"
+          echo "Commit: $GITHUB_SHA"
+
+  deploy-prod:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+    steps:
+      - name: Simulate deploy to production
+        run: |
+          echo "Deploy simulated for production environment"
+          echo "Commit: $GITHUB_SHA"

@@ -60,4 +60,25 @@ Seguimos el modelo de ramas de **GitHub Flow**:
    npm run prepare
    ```
 
+## Testing y CI
+
+### Tests locales
+
+- Unit tests:
+   ```bash
+   npm run test
+   ```
+- E2E tests:
+   ```bash
+   npm run test:e2e
+   ```
+- Cobertura:
+   ```bash
+   npm run test:cov
+   ```
+
+### Pipeline CI
+
+El workflow ejecuta: lint, unit tests, e2e tests y build en cada push y pull request.
+
 ---

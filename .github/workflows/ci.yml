@@ -3,7 +3,6 @@ name: backend-ci
 on:
   push:
   pull_request:
-
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -24,16 +23,16 @@ jobs:
           --health-retries=5
 
     env:
-      DB_HOST: localhost
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: getonboard_test
-      JWT_SECRET: test_secret
-      JWT_REFRESH_SECRET: test_refresh_secret
-      CLOUDINARY_CLOUD_NAME: test
-      CLOUDINARY_API_KEY: test
-      CLOUDINARY_API_SECRET: test
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_PORT: ${{ secrets.DB_PORT }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_NAME: ${{ secrets.DB_NAME }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
+      CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+      CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+      CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
 
     steps:
       - name: Checkout

@@ -12,6 +12,7 @@ async function bootstrap() {
       'http://localhost:3001',
       'http://localhost:3002',
       'http://localhost:3003',
+      'http://localhost:3050',
       process.env.FRONTEND_URL,
     ].filter(Boolean),
     credentials: true,

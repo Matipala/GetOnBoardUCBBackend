@@ -5,6 +5,9 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
+import { DataSource, In } from 'typeorm';
+import { User } from '../src/users/entities/user.entity';
+import { Offer } from '../src/offers/entities/offer.entity';
 
 type AuthUserResponse = {
   id: string;
@@ -34,23 +37,25 @@ type OfferResponse = {
 };
 
 describe('AppController (e2e)', () => {
+  // Identificador unico por ejecucion para evitar conflictos en DB.
+  const runId = `${Date.now()}-${Math.floor(Math.random() * 10000)}`;
   const testUsers = {
     authStudent: {
-      email: 'e2e.student@test.com',
+      email: `e2e.student.${runId}@test.com`,
       password: 'Test12345',
       fullName: 'E2E Cristopher',
       role: 'student',
       career: 'Ingenieria de Software',
     },
     employer: {
-      email: 'e2e.employer@test.com',
+      email: `e2e.employer.${runId}@test.com`,
       password: 'Test12345',
       fullName: 'E2E Gonzalo',
       role: 'employer',
       career: 'Ingenieria de Software',
     },
     student: {
-      email: 'e2e.student2@test.com',
+      email: `e2e.student2.${runId}@test.com`,
       password: 'Test12345',
       fullName: 'E2E Evert',
       role: 'student',
@@ -58,7 +63,11 @@ describe('AppController (e2e)', () => {
     },
   };
   let app: INestApplication<App>;
+  let dataSource: DataSource;
+  const createdEmails: string[] = [];
+  const createdOfferIds: number[] = [];
 
+  // Inicializa la app real y captura el DataSource para limpiar datos.
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -66,12 +75,27 @@ describe('AppController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+    dataSource = moduleFixture.get(DataSource);
   });
 
+  // Limpia usuarios y ofertas creados durante la suite.
   afterAll(async () => {
+    if (dataSource) {
+      if (createdOfferIds.length > 0) {
+        await dataSource
+          .getRepository(Offer)
+          .delete({ id: In(createdOfferIds) });
+      }
+      if (createdEmails.length > 0) {
+        await dataSource
+          .getRepository(User)
+          .delete({ email: In(createdEmails) });
+      }
+    }
     await app.close();
   });
 
+  // Smoke test de la ruta raiz.
   it('/ (GET)', () => {
     return request(app.getHttpServer())
       .get('/')
@@ -79,8 +103,10 @@ describe('AppController (e2e)', () => {
       .expect('Hola Cambada!');
   });
 
+  // Flujo de auth completo: registro, login, refresh y ruta protegida.
   it('auth flow: register, login, refresh, protected route', async () => {
     const { email, password, fullName, role, career } = testUsers.authStudent;
+    createdEmails.push(email);
 
     const registerResponse = await request(app.getHttpServer())
       .post('/auth/register')
@@ -132,6 +158,7 @@ describe('AppController (e2e)', () => {
     expect(profileResponse.body).toHaveProperty('id', userId);
   });
 
+  // Flujo de ofertas: crear como empleador y consultar como estudiante.
   it('flujo de ofertas: empleador puede crear y estudiante obtener ofertas', async () => {
     const employer = testUsers.employer;
     const student = testUsers.student;
@@ -146,6 +173,7 @@ describe('AppController (e2e)', () => {
         career: employer.career,
       })
       .expect(200);
+    createdEmails.push(employer.email);
 
     const employerLoginResponse = await request(app.getHttpServer())
       .post('/auth/login')
@@ -179,6 +207,7 @@ describe('AppController (e2e)', () => {
     expect(createdOffer).toHaveProperty('title', offerPayload.title);
 
     const offerId = createdOffer.id;
+    createdOfferIds.push(offerId);
 
     await request(app.getHttpServer()).get(`/offers/${offerId}`).expect(200);
 
@@ -202,6 +231,7 @@ describe('AppController (e2e)', () => {
         career: student.career,
       })
       .expect(200);
+    createdEmails.push(student.email);
 
     const studentLoginResponse = await request(app.getHttpServer())
       .post('/auth/login')
