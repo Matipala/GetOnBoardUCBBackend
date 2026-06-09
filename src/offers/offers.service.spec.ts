@@ -63,15 +63,15 @@ describe('OffersService (integration)', () => {
     const result = await offersService.create(payload, 'emp-1');
     createdOfferIds.push(result.id);
 
-    expect(result).toHaveProperty('id');
-    expect(result.employerId).toBe('emp-1');
-    expect(result.title).toBe(payload.title);
+    expect(result).toHaveProperty('id'); //la oferta fue creada
+    expect(result.employerId).toBe('emp-1'); //el id es correcto
+    expect(result.title).toBe(payload.title); //Los datos fueron persistidos.
   });
 
   // Buscar una oferta inexistente debe retornar NotFound.
   it('lanza un error cuando no se encuentra la oferta', async () => {
     await expect(offersService.findOne(999999)).rejects.toThrow(
-      NotFoundException,
+      NotFoundException, //credenciales incorrectas.
     );
   });
 
@@ -83,6 +83,6 @@ describe('OffersService (integration)', () => {
 
     await expect(
       offersService.update(created.id, { title: 'New' }, 'emp-2', 'employer'),
-    ).rejects.toThrow(ForbiddenException);
+    ).rejects.toThrow(ForbiddenException); //acceso prohibido.
   });
 });

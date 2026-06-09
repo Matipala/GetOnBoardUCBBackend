@@ -8,7 +8,7 @@ import { AppModule } from './../src/app.module';
 import { DataSource, In } from 'typeorm';
 import { User } from '../src/users/entities/user.entity';
 import { Offer } from '../src/offers/entities/offer.entity';
-
+//Representa un usuario autenticado.
 type AuthUserResponse = {
   id: string;
   name: string;
@@ -16,13 +16,13 @@ type AuthUserResponse = {
   role: string;
   career: string | null;
 };
-
+//Respuesta típica de login o registro.
 type AuthResponse = {
   access_token: string;
   refresh_token: string;
   user: AuthUserResponse;
 };
-
+//Representa una oferta.
 type OfferResponse = {
   id: number;
   title: string;
@@ -38,7 +38,7 @@ type OfferResponse = {
 
 describe('AppController (e2e)', () => {
   // Identificador unico por ejecucion para evitar conflictos en DB.
-  const runId = `${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+  const runId = `${Date.now()}-${Math.floor(Math.random() * 10000)}`; //esto se utiliza para que los correos sean unicos
   const testUsers = {
     authStudent: {
       email: `e2e.student.${runId}@test.com`,
