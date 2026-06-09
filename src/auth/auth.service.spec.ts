@@ -19,10 +19,10 @@ const createUserPayload = () => ({
 describe('AuthService (integration)', () => {
   jest.setTimeout(20000);
 
-  let moduleRef: TestingModule;
-  let authService: AuthService;
-  let dataSource: DataSource;
-  let createdEmails: string[] = [];
+  let moduleRef: TestingModule; //Contiene el módulo de pruebas.
+  let authService: AuthService; //Instancia real del servicio.
+  let dataSource: DataSource; //Conexión a PostgreSQL.
+  let createdEmails: string[] = []; //Lista de usuarios creados para eliminarlos después.
 
   // Inicializa el modulo completo y la conexion a la BD real.
   beforeAll(async () => {
@@ -34,13 +34,12 @@ describe('AuthService (integration)', () => {
     process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-secret';
     process.env.JWT_REFRESH_SECRET =
       process.env.JWT_REFRESH_SECRET || 'test-refresh-secret';
-
     moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [AppModule], //crea el modulo y carga toda la aplicación.
     }).compile();
 
-    authService = moduleRef.get(AuthService);
-    dataSource = moduleRef.get(DataSource);
+    authService = moduleRef.get(AuthService); //obtenemos dependencias reales del servicio
+    dataSource = moduleRef.get(DataSource); // y de la base de datos
   });
 
   // Limpia los usuarios creados en cada test.
@@ -53,7 +52,7 @@ describe('AuthService (integration)', () => {
 
   afterAll(async () => {
     if (moduleRef) {
-      await moduleRef.close();
+      await moduleRef.close(); //cierra la aplicacion al final
     }
   });
 
@@ -110,7 +109,7 @@ describe('AuthService (integration)', () => {
 
     await expect(
       authService.signIn(payload.email, 'BadPass123'),
-    ).rejects.toThrow(UnauthorizedException);
+    ).rejects.toThrow(UnauthorizedException); //credenciales incorrectas.
   });
 
   // Refresh valido devuelve nuevos tokens.
@@ -127,12 +126,12 @@ describe('AuthService (integration)', () => {
     );
 
     const refreshResult = await authService.refreshTokens(
-      signUpResult.user.id,
-      signUpResult.refresh_token,
+      signUpResult.user.id, //llama el refresh con el id del usuario creado al registrarse
+      signUpResult.refresh_token, // y el refresh tambien
     );
 
-    expect(refreshResult.access_token).toBeTruthy();
-    expect(refreshResult.refresh_token).toBeTruthy();
+    expect(refreshResult.access_token).toBeTruthy(); //valida el acceso
+    expect(refreshResult.refresh_token).toBeTruthy(); //y aqui valida el token generando nuevos tokens
   });
 
   // Refresh invalido debe responder con Forbidden.
@@ -150,6 +149,6 @@ describe('AuthService (integration)', () => {
 
     await expect(
       authService.refreshTokens(signUpResult.user.id, 'invalid-refresh'),
-    ).rejects.toThrow(ForbiddenException);
+    ).rejects.toThrow(ForbiddenException); //acceso prohibido.
   });
 });
