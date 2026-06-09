@@ -19,16 +19,27 @@ import { CompaniesModule } from './companies/companies.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres', //cargamos las variables de entorno
-        host: configService.get<string>('DB_HOST'),
-        port: configService.get<number>('DB_PORT'),
-        username: configService.get<string>('DB_USER'),
-        password: configService.get<string>('DB_PASSWORD'),
-        database: configService.get<string>('DB_NAME'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'], //la carga de las entidades
-        synchronize: true, //la sincronizacion para crear/actualizar la base de datos
-      }),
+      useFactory: (configService: ConfigService) => {
+        const isProduction =
+          configService.get<string>('NODE_ENV') === 'production';
+
+        return {
+          type: 'postgres',
+          host: configService.get<string>('DB_HOST'),
+          port: configService.get<number>('DB_PORT'),
+          username: configService.get<string>('DB_USER'),
+          password: configService.get<string>('DB_PASSWORD'),
+          database: configService.get<string>('DB_NAME'),
+          entities: [__dirname + '/**/*.entity{.ts,.js}'],
+          synchronize: true,
+
+          ssl: isProduction
+            ? {
+                rejectUnauthorized: false,
+              }
+            : false,
+        };
+      },
     }),
     OffersModule,
     UsersModule,
