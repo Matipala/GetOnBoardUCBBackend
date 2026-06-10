@@ -4,6 +4,10 @@
 
 API y servicios backend para la plataforma de conexión laboral dirigida a estudiantes y graduados de la UCB. Enfocada en proveer un acceso seguro, estructurado y escalable para la gestión de usuarios, empresas, ofertas de trabajo y postulaciones.
 
+## Enlaces Públicos
+
+- **API Desplegada (Producción)**: https://getonboarducbbackend.onrender.com
+
 ##  Tech Stack
 
 - **Framework:** [NestJS](https://nestjs.com/)
@@ -20,8 +24,9 @@ Para este repositorio utilizamos **ESLint**, **Prettier** y **Husky**.
 ## GitHub Flow
 Seguimos el modelo de ramas de **GitHub Flow**:
 1. `main` siempre es producción.
-2. Crea una rama descriptiva para cada tarea: `feature/nombre-tarea` o `fix/nombre-error`.
-3. Abre un Pull Request para revisión antes de mergear a `main`.
+2. `test` siempre es preview
+3. Crea una rama descriptiva para cada tarea: `feature/nombre-tarea` o `fix/nombre-error`.
+4. Abre un Pull Request para revisión en `test` antes de mergear a `main`.
 
 ## Instalación Local
 
@@ -77,8 +82,10 @@ Seguimos el modelo de ramas de **GitHub Flow**:
    npm run test:cov
    ```
 
-### Pipeline CI
+### Pipeline CI (GitHub Actions)
 
-El workflow ejecuta: lint, unit tests, e2e tests y build en cada push y pull request.
+El repositorio cuenta con flujos de trabajo automatizados en GitHub Actions para asegurar la calidad del código:
+- **Linting (`lint.yml`)**: Ejecuta `npm run lint` (usando ESLint). Se dispara automáticamente en cada `push` o `pull request` hacia las ramas `main` o `test`. Su objetivo es bloquear la integración de código que no cumpla con los estándares de estilo.
+- **Pruebas (`ci.yml`)**: Ejecuta tests unitarios, tests e2e y el proceso de compilación (build) del proyecto.
 
 ---
