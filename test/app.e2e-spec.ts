@@ -103,6 +103,16 @@ describe('AppController (e2e)', () => {
       .expect('Hola Cambada!');
   });
 
+  // Health check test
+  it('/health (GET)', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/health')
+      .expect(200);
+
+    expect(response.body).toHaveProperty('status', 'ok');
+    expect(response.body).toHaveProperty('database', 'connected');
+  });
+
   // Flujo de auth completo: registro, login, refresh y ruta protegida.
   it('auth flow: register, login, refresh, protected route', async () => {
     const { email, password, fullName, role, career } = testUsers.authStudent;
