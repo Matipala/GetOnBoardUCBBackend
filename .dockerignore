@@ -4,8 +4,12 @@ npm-debug.log
 .git
 .DS_Store
 .env
+.env.example
 Dockerfile
 docker-compose.yml
 .husky
 test
+coverage
+docs
 README.md
+.github

@@ -1,5 +1,9 @@
 version: '3.8'
 
+networks:
+  getonboard-net:
+    driver: bridge
+
 services:
   db:
     image: postgres:15
@@ -17,6 +21,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - getonboard-net
 
   backend:
     build:
@@ -31,18 +37,28 @@ services:
       - /app/node_modules
     environment:
       - PORT=${PORT:-3001}
+      - NODE_ENV=development
       - DB_HOST=db
       - DB_PORT=5432
       - DB_USER=${DB_USER:-root}
       - DB_PASSWORD=${DB_PASSWORD:-12345}
       - DB_NAME=${DB_NAME:-getonboard}
-      - JWT_SECRET=${JWT_SECRET}
-      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
-      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
-      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - JWT_SECRET=${JWT_SECRET:-secret}
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME:-cloud}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY:-key}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET:-secret}
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:${PORT:-3001}/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     command: npm run start:dev
+    networks:
+      - getonboard-net
+
 volumes:
   postgres_data:
