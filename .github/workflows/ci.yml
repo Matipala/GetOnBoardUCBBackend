@@ -12,9 +12,9 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: getonboard_test
+          POSTGRES_USER
+          POSTGRES_PASSWOR
+          POSTGRES_DB
         ports:
           - "5432:5432"
         options: >-
