@@ -135,8 +135,8 @@ A continuación se adjuntan las capturas de pantalla de los paneles de "Usage/Bi
 
 | Proveedor Cloud | Evidencia de Consumo (Screenshot) | Estado del Plan |
 | :--- | :--- | :--- |
-| **Vercel** (Frontend) | ![alt text](image.png) | Hobby (Free) |
-| **Render** (Backend & DB) | ![alt text](image-1.png) | Free Tier |
+| **Vercel** (Frontend) | ![alt text](/docs/imagenes/image.png) | Hobby (Free) |
+| **Render** (Backend & DB) | ![alt text](/docs/imagenes/image-1.png) | Free Tier |
 
 **Estimación Mensual (Arquitectura Free Tier):**
 *   **Vercel (Frontend):** Plan Hobby. $0.00 USD/mes.
