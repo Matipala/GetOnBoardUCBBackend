@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  deploy-dev:
+  deploy-test:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/test'
     environment:
