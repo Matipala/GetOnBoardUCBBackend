@@ -44,7 +44,7 @@ Para el cumplimiento de este proyecto, se han seleccionado y desarrollado los si
 
 ## 3. Definición de Arquitectura de Red y Nube
 
-![alt text](image-7.png)
+![alt text](/docs/imagenes/image-7.png)
 
 **Descripción Lógica de la Infraestructura:**
 1.  **Código Fuente:** Almacenado en repositorios separados en **GitHub**.
@@ -159,20 +159,20 @@ A continuación se adjuntan las capturas de pantalla de los paneles de "Usage/Bi
 
 *   **Pilar 1 (Docker):**
 
-    ![alt text](image-2.png)
+    ![alt text](/docs/imagenes/image-2.png)
 
-    ![alt text](image3.png)
+    ![alt text](/docs/imagenes/image3.png)
 
 *   **Pilar 3 (CI/CD):**
 
     Frontend CI/CD
 
-    ![alt text](image-3.png)
+    ![alt text](/docs/imagenes/image-3.png)
 
-    ![alt text](image-4.png)
+    ![alt text](/docs/imagenes/image-4.png)
 
     Backend CI/CD
     
-    ![alt text](image-5.png)
+    ![alt text](/docs/imagenes/image-5.png)
 
-    ![alt text](image-6.png)
+    ![alt text](/docs/imagenes/image-6.png)
