@@ -1,7 +1,8 @@
 set -e
 
 ENV_FILE=".env"
-SECRET_FILE="k8s/secret.yaml"
+SECRET_FILE="k8s/secret.yaml"       
+SECRET_EXAMPLE="k8s/secret.example.yaml"  
 
 if [ ! -f "$ENV_FILE" ]; then
   echo "No se encontró el archivo .env en el directorio actual."
@@ -15,7 +16,7 @@ b64() {
   echo -n "$1" | base64
 }
 
-echo "🔐 Generando $SECRET_FILE con valores reales..."
+echo " Generando $SECRET_FILE con valores reales..."
 
 cat > "$SECRET_FILE" <<EOF
 # ARCHIVO GENERADO AUTOMÁTICAMENTE — NO COMMITEAR AL REPOSITORIO

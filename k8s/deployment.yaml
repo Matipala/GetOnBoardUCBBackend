@@ -24,8 +24,8 @@ spec:
     spec:
       containers:
         - name: backend
-          image: getonboard-backend:latest
-          imagePullPolicy: Always
+          image: getonboard-backend:local
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3001
               name: http
