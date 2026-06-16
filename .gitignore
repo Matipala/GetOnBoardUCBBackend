@@ -42,6 +42,11 @@ lerna-debug.log*
 .env.production.local
 .env.local
 
+# Kubernetes — Secret generado localmente (contiene valores reales en base64)
+# El archivo k8s/secret.yaml commiteado es solo una plantilla con placeholders
+# El script generate-k8s-secret.sh sobreescribe ese archivo con valores reales
+# Para restaurar la plantilla: git checkout -- k8s/secret.yaml
+
 # temp directory
 .temp
 .tmp
