@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: getonboard-backend-svc
+  namespace: getonboard
+  labels:
+    app: getonboard-backend
+spec:
+  selector:
+    app: getonboard-backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3001
+      name: http
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: getonboard-backend-ingress
+  namespace: getonboard
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  rules:
+    - host: api.getonboard-ucb.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: getonboard-backend-svc
+                port:
+                  number: 80

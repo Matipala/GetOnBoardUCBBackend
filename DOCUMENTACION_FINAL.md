@@ -37,7 +37,7 @@
 
 Para el cumplimiento de este proyecto, se han seleccionado y desarrollado los siguientes dos (2) pilares electivos:
 
-1.  **PILAR 1: Contenedores y Orquestación (Docker)**
+1.  **PILAR 1: Contenedores y Orquestación (Docker & Kubernetes)**
 2.  **PILAR 3: Automatización de Pipelines (CI/CD)**
 
 ---
@@ -48,10 +48,11 @@ Para el cumplimiento de este proyecto, se han seleccionado y desarrollado los si
 
 **Descripción Lógica de la Infraestructura:**
 1.  **Código Fuente:** Almacenado en repositorios separados en **GitHub**.
-2.  **Pipeline CI/CD:** **GitHub Actions** orquesta las pruebas unitarias (9 en total), análisis de seguridad (npm audit, Trivy) y el despliegue hacia entornos de producción.
-3.  **Hosting del Frontend:** Desplegado nativamente en **Vercel** (Edge Network, CDN global).
-4.  **Hosting del Backend & Base de Datos:** Desplegado en **Render**. Render expone el servicio web (NestJS en **Docker**) a través de su balanceador de carga y provisiona el servicio gestionado de PostgreSQL.
-5.  **Flujo de Datos:** El cliente web (Vercel) consume los endpoints RESTful del Backend (Render) vía HTTPS. El backend interactúa internamente con PostgreSQL.
+2.  **Pipeline CI/CD:** **GitHub Actions** orquesta las pruebas unitarias (9 en total), análisis de seguridad (npm audit, Trivy), escaneo de imagen Docker (Trivy) y el despliegue hacia entornos de producción.
+3.  **Hosting del Frontend (Producción):** Desplegado nativamente en **Vercel** (Edge Network, CDN global).
+4.  **Hosting del Backend & Base de Datos (Producción):** Desplegado en **Render**. Render expone el servicio web (NestJS en **Docker**) a través de su balanceador de carga y provisiona el servicio gestionado de PostgreSQL (Render Managed PostgreSQL — equivalente a RDS/Cloud SQL).
+5.  **Manifiestos de Kubernetes (Ruta B):** Se proveen manifiestos completos en el directorio `k8s/` de ambos repositorios para un despliegue alternativo en un clúster administrado (GKE/AKS). Incluye: `Namespace`, `Deployment` (rolling update), `Service` (ClusterIP + Ingress), `ConfigMap`, `Secret` y `HorizontalPodAutoscaler` (HPA) para autoescalado por CPU y memoria.
+6.  **Flujo de Datos:** El cliente web (Vercel) consume los endpoints RESTful del Backend (Render) vía HTTPS. El backend interactúa con PostgreSQL administrado externo.
 
 ---
 
@@ -157,11 +158,26 @@ A continuación se adjuntan las capturas de pantalla de los paneles de "Usage/Bi
 
 ## Anexo: Evidencias de los Pilares
 
-*   **Pilar 1 (Docker):**
+*   **Pilar 1 (Docker & Kubernetes):**
 
-    ![alt text](/docs/imagenes/image-2.png)
+    **Docker — Imagen Multi-Stage Build corriendo en Render:**
 
-    ![alt text](/docs/imagenes/image3.png)
+    ![Docker deploy en Render](/docs/imagenes/image-2.png)
+
+    ![Docker Trivy scan CI](/docs/imagenes/image3.png)
+
+    **Kubernetes — Manifiestos en el repositorio (`k8s/`):**
+
+    | Manifiesto | Recurso K8s | Propósito |
+    | :--- | :--- | :--- |
+    | `k8s/namespace.yaml` | `Namespace` | Aislamiento del entorno `getonboard` |
+    | `k8s/configmap.yaml` | `ConfigMap` | Variables no sensibles (PORT, NODE_ENV, FRONTEND_URL) |
+    | `k8s/secret.yaml` | `Secret` (Opaque) | Credenciales sensibles (DB, JWT, Cloudinary) |
+    | `k8s/deployment.yaml` | `Deployment` | Backend NestJS con rolling update, 2 réplicas base, liveness/readiness probes |
+    | `k8s/service.yaml` | `Service` + `Ingress` | Exposición interna (ClusterIP) y externa (Ingress HTTPS) |
+    | `k8s/hpa.yaml` | `HorizontalPodAutoscaler` | Autoescalado 2–10 réplicas por CPU (60%) y memoria (70%) |
+
+    **Diseño de desacoplamiento:** La base de datos se mantiene como servicio administrado externo (Render PostgreSQL), desacoplada de la capa de cómputo. Los pods del backend se conectan vía variables inyectadas desde el `Secret`, sin conocer detalles de la infraestructura de DB.
 
 *   **Pilar 3 (CI/CD):**
 
