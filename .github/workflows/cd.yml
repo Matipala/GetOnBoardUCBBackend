@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - develop
+      - test
 
 permissions:
   contents: read
@@ -12,13 +12,14 @@ permissions:
 jobs:
   deploy-dev:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/test'
     environment:
-      name: dev
+      name: test
     steps:
-      - name: Simulate deploy to dev
+      - name: Deploy to Render (dev/test)
         run: |
-          echo "Deploy simulated for dev environment"
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_TEST }}"
+          echo "✅ Deploy triggered for test environment"
           echo "Commit: $GITHUB_SHA"
 
   deploy-prod:
@@ -27,7 +28,8 @@ jobs:
     environment:
       name: production
     steps:
-      - name: Simulate deploy to production
+      - name: Deploy to Render (production)
         run: |
-          echo "Deploy simulated for production environment"
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_PROD }}"
+          echo "✅ Deploy triggered for production environment"
           echo "Commit: $GITHUB_SHA"

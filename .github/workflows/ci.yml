@@ -3,6 +3,7 @@ name: backend-ci
 on:
   push:
   pull_request:
+
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -41,7 +42,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
@@ -58,3 +59,18 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # ─── Security & Container Scanning ───
+
+      - name: Security audit (npm)
+        run: npm audit --audit-level=high || true
+
+      - name: Build Docker image
+        run: docker build -t getonboard-backend:${{ github.sha }} .
+
+      - name: Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: getonboard-backend:${{ github.sha }}
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
