@@ -24,16 +24,16 @@ jobs:
           --health-retries=5
 
     env:
-      DB_HOST: 127.0.0.1
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: getonboard_test
-      JWT_SECRET: test-secret
-      JWT_REFRESH_SECRET: test-refresh-secret
-      CLOUDINARY_CLOUD_NAME: test-cloud
-      CLOUDINARY_API_KEY: test-key
-      CLOUDINARY_API_SECRET: test-secret
+      DB_HOST
+      DB_PORT
+      DB_USER
+      DB_PASSWORD
+      DB_NAME
+      JWT_SECRET
+      JWT_REFRESH_SECRET
+      CLOUDINARY_CLOUD_NAME
+      CLOUDINARY_API_KEY
+      CLOUDINARY_API_SECRET
 
     steps:
       - name: Checkout
