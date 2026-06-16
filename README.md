@@ -86,6 +86,44 @@ Seguimos el modelo de ramas de **GitHub Flow**:
 
 El repositorio cuenta con flujos de trabajo automatizados en GitHub Actions para asegurar la calidad del código:
 - **Linting (`lint.yml`)**: Ejecuta `npm run lint` (usando ESLint). Se dispara automáticamente en cada `push` o `pull request` hacia las ramas `main` o `test`. Su objetivo es bloquear la integración de código que no cumpla con los estándares de estilo.
-- **Pruebas (`ci.yml`)**: Ejecuta tests unitarios, tests e2e y el proceso de compilación (build) del proyecto.
+- **Pruebas (`ci.yml`)**: Ejecuta tests unitarios, tests e2e, compilación (build), auditoría de seguridad y escaneo de vulnerabilidades con Trivy.
+- **Deploy (`cd.yml`)**: Dispara el deploy automático a Render cuando se hace push a `main` (producción) o `develop` (desarrollo).
+
+## 🐳 Docker
+
+### Levantar el stack completo
+
+El proyecto incluye un `docker-compose.yml` que orquesta los siguientes servicios en una red Docker compartida (`getonboard-net`):
+
+| Servicio | Imagen | Puerto |
+|---|---|---|
+| `db` | PostgreSQL 15 | 5432 |
+| `backend` | NestJS (build local) | 3004 → 3001 |
+
+```bash
+# Construir y levantar todos los servicios
+docker-compose up --build
+
+# Levantar en segundo plano
+docker-compose up --build -d
+
+# Ver estado de los servicios y healthchecks
+docker-compose ps
+
+# Detener todo
+docker-compose down
+```
+
+### Health Check
+
+El backend expone un endpoint `/health` que verifica la conexión a la base de datos:
+
+```bash
+# Verificar el estado del backend
+curl http://localhost:3004/health
+# Respuesta esperada: {"status":"ok","database":"connected"}
+```
+
+Docker utiliza este endpoint para monitorear automáticamente el estado del servicio backend.
 
 ---
