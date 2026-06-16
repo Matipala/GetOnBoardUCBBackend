@@ -1,20 +1,7 @@
-#!/bin/bash
-# ==============================================================================
-# load-test-hpa.sh
-# Simula tráfico al backend para demostrar el autoescalado (HPA)
-#
-# Uso:
-#   chmod +x load-test-hpa.sh
-#   ./load-test-hpa.sh
-#
-# En otra terminal, monitorea el HPA con:
-#   watch -n 2 kubectl get hpa -n getonboard
-# ==============================================================================
-
 NAMESPACE="getonboard"
 BACKEND_PORT="3001"
-DURATION=120      # segundos de carga
-CONCURRENCY=50    # peticiones paralelas
+DURATION=120 
+CONCURRENCY=50 
 
 echo ""
 echo "╔══════════════════════════════════════════════════════╗"
@@ -30,11 +17,11 @@ echo ""
 # ── Verificar que el backend responde ──────────────────────────────────────────
 echo "▶ Verificando que el backend está activo..."
 if ! curl -sf "http://localhost:$BACKEND_PORT/health" > /dev/null; then
-  echo "❌ El backend no responde en http://localhost:$BACKEND_PORT/health"
+  echo " El backend no responde en http://localhost:$BACKEND_PORT/health"
   echo "   Verifica que el port-forward esté activo."
   exit 1
 fi
-echo "   ✅ Backend activo"
+echo "    Backend activo"
 echo ""
 
 # ── Monitoreo del HPA en background ───────────────────────────────────────────
@@ -66,7 +53,7 @@ while [ $SECONDS -lt $END_TIME ]; do
   done
   wait
   REQUEST_COUNT=$((REQUEST_COUNT + CONCURRENCY * 2))
-  echo -ne "\r   📊 Peticiones enviadas: $REQUEST_COUNT | Tiempo restante: $((END_TIME - SECONDS))s"
+  echo -ne "\r    Peticiones enviadas: $REQUEST_COUNT | Tiempo restante: $((END_TIME - SECONDS))s"
 done
 
 echo ""
@@ -79,6 +66,5 @@ kubectl get hpa -n "$NAMESPACE"
 echo ""
 kubectl get pods -n "$NAMESPACE"
 echo ""
-echo "✅ Load test completado. Total peticiones: $REQUEST_COUNT"
+echo " Load test completado. Total peticiones: $REQUEST_COUNT"
 echo ""
-echo "📸 Captura estas pantallas como evidencia del autoescalado para la documentación."

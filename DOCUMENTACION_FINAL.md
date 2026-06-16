@@ -179,6 +179,18 @@ A continuación se adjuntan las capturas de pantalla de los paneles de "Usage/Bi
 
     **Diseño de desacoplamiento:** La base de datos se mantiene como servicio administrado externo (Render PostgreSQL), desacoplada de la capa de cómputo. Los pods del backend se conectan vía variables inyectadas desde el `Secret`, sin conocer detalles de la infraestructura de DB.
 
+    ![alt text](<docs/imagenes/image copy.png>)
+
+    ![alt text](<docs/imagenes/image copy 2.png>)
+
+    ![alt text](<docs/imagenes/image copy 3.png>)
+
+    ![alt text](<docs/imagenes/image copy 4.png>)
+
+    ![alt text](<docs/imagenes/image copy 5.png>)
+
+    ![alt text](<docs/imagenes/image copy 6.png>)
+
 *   **Pilar 3 (CI/CD):**
 
     Frontend CI/CD

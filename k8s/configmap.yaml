@@ -6,9 +6,8 @@ metadata:
   labels:
     app: getonboard-backend
 data:
-  NODE_ENV: "production"
+  NODE_ENV: "development"
   PORT: "3001"
   DB_PORT: "5432"
-  FRONTEND_URL: "https://get-on-board-ucb.vercel.app"
-  # DB_HOST apunta al servicio administrado externo (Render PostgreSQL)
-  # Este valor se sobreescribe en el Secret o en las variables de entorno del despliegue
+  FRONTEND_URL: "https://getonboarducb.vercel.app/"
+
